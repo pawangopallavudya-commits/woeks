@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>WOEX — Find Skilled Workers Near You</title>
+<link rel="stylesheet" href="profile.css">
+<script src="profile.js"></script>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand" onclick="go('home')" role="button" tabindex="0" aria-label="Kaarigar home">
+      <svg class="brand-mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#dc9a2e"/>
+        <path d="M14 12 L14 28 M14 20 L23 12 M14 20 L23 28" stroke="#182742" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div class="brand-text">
+        <span class="display">WOEX</span>
+        <span class="tag">Where Skills Find Work</span>
+      </div>
+    </div>
+    <div class="nav-links" id="nav-links-desktop"></div>
+    <div class="nav-right" id="nav-right"></div>
+    <button class="burger" id="burger-btn" aria-label="Open menu" onclick="toggleMobileMenu()">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu"></div>
+</nav>
+
+<!-- HOME -->
+<div class="view active" id="view-home">
+  <div class="wrap hero">
+    <div class="mode-toggle">
+      <button class="mode-btn" id="mode-btn-work" onclick="setHomeMode('work')">I want to find work</button>
+      <button class="mode-btn" id="mode-btn-hire" onclick="setHomeMode('hire')">I want to hire someone</button>
+      <button class="mode-btn" id="mode-btn-post" onclick="setHomeMode('post')">I want to post a job</button>
+    </div>
+    <div class="hero-grid" id="hero-grid"></div>
+  </div>
+
+  <div class="wrap" id="top-rated-section" style="padding-top:10px;">
+    <div class="section-head">
+      <div><h2 class="section-title">Top rated this week</h2><div class="section-sub">The best-reviewed people on WORX right now</div></div>
+      <button class="nav-btn" style="color:var(--indigo)" onclick="go('browse')">Browse everyone →</button>
+    </div>
+    <div class="top-rated-scroll" id="top-rated-scroll"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:8px;">
+    <div class="section-head">
+      <h2 class="section-title" id="reg-grid-title">Four ways to register</h2>
+    </div>
+    <div class="role-grid" style="margin-top:16px;" id="reg-type-grid"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:34px;">
+    <div class="section-head">
+      <h2 class="section-title">Browse by trade</h2>
+      <button class="nav-btn" style="color:var(--indigo)" onclick="go('browse')">See who's near you →</button>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:16px;">
+    <h2 class="section-title" id="steps-title">How it works</h2>
+    <div class="steps" id="steps-grid"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:16px;">
+    <h2 class="section-title">Trust &amp; safety</h2>
+    <div class="trust-grid">
+      <div class="trust-card"><div class="trust-icon">🔐</div><h3>OTP-verified</h3><p>Every account is confirmed with a one-time code before it can chat or list work.</p></div>
+      <div class="trust-card"><div class="trust-icon">☎️</div><h3>Masked calling</h3><p>Calls need the worker's approval and never reveal either phone number.</p></div>
+      <div class="trust-card"><div class="trust-icon">🛡️</div><h3>Extra care by default</h3><p>Some profiles offer secure chat only, with calling switched off for added safety.</p></div>
+      <div class="trust-card"><div class="trust-icon">🚩</div><h3>Report &amp; block</h3><p>Any conversation can be reported or blocked in one tap — our team reviews every report.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="view" id="view-auth">
+  <div class="wrap auth-shell">
+    <button class="back-link" onclick="go('home')">← Back</button>
+    <div class="auth-card" id="auth-card"></div>
+  </div>
+</div>
+
+<!-- BROWSE -->
+<div class="view" id="view-browse">
+  <div class="wrap" style="padding-top:32px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 class="section-title" style="margin:0;">Workers near you</h2>
+      <button class="nav-btn" onclick="toggleFiltersPanel()" id="filters-panel-btn">🔍 Filters</button>
+    </div>
+    <div id="filters-panel" style="display:none; margin-bottom:20px; padding:16px; background:rgba(0,0,0,.02); border-radius:8px;">
+      <div class="loc-bar" style="align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <span class="mono" style="font-size:13px; color:var(--ink-soft);">📍 Your metro city:</span>
+        <select id="loc-input" onchange="onLocationChange(this.value)" aria-label="Select your metro city"></select>
+      </div>
+      <button class="nav-btn" style="margin-bottom:12px; width:100%;" onclick="detectLocation()">Auto-detect location</button>
+      <input class="search-input" id="search-input" type="text" placeholder="Search by name, trade or skill…" oninput="onSearch(this.value)" aria-label="Search workers">
+
+      <div class="filter-group">
+        <span class="filter-label">Category</span>
+        <div class="chip-row" id="type-chip-row"></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Trade</span>
+        <div class="chip-row" id="chip-row"></div>
+      </div>
+
+      <button class="more-filters-toggle" onclick="toggleMoreFilters()" id="more-filters-btn">▸ More filters (price, availability, experience)</button>
+      <div class="more-filters-body" id="more-filters-body" style="display:none;">
+        <div class="filter-group">
+          <span class="filter-label">Price</span>
+          <div class="chip-row" id="price-chip-row"></div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Availability</span>
+          <div class="chip-row" id="avail-chip-row"></div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Experience</span>
+          <div class="chip-row" id="exp-chip-row"></div>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Quick filters</span>
+          <div class="chip-row">
+            <button class="chip" id="saved-chip" onclick="toggleSavedFilter()"> Saved only</button>
+            <button class="chip" id="verified-chip" onclick="toggleVerifiedFilter()">✓ Verified only</button>
+            <button class="chip" id="toprated-chip" onclick="toggleTopRatedFilter()">★ Top rated only</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar-foot">
+        <span class="result-count" id="result-count"></span>
+        <div class="sort-bar">
+          <span class="mono" style="font-size:12.5px; color:var(--ink-soft);">Sort:</span>
+          <select id="sort-input" onchange="onSortChange(this.value)" aria-label="Sort workers">
+            <option value="dist">Nearest first</option>
+            <option value="exp">Most experienced</option>
+            <option value="rating">Top rated</option>
+            <option value="price_low">Price: low to high</option>
+            <option value="price_high">Price: high to low</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="browse-groups" style="width:100%;"></div>
+  </div>
+</div>
+
+<script>
+const METRO_CITY_COORDS = {
+  'Mumbai':[19.0760,72.8777],
+  'Delhi NCR':[28.6139,77.2090],
+  'Bengaluru':[12.9716,77.5946],
+  'Hyderabad':[17.3850,78.4867],
+  'Chennai':[13.0827,80.2707],
+  'Kolkata':[22.5726,88.3639],
+  'Pune':[18.5204,73.8567],
+};
+function detectLocation(){
+  if(!navigator.geolocation){
+    showToast('Geolocation is not available');
+    return;
+  }
+  showToast('Detecting location…');
+  navigator.geolocation.getCurrentPosition(position => {
+    const city = nearestMetroCity(position.coords.latitude, position.coords.longitude);
+    if(city){
+      state.location = city;
+      renderBrowse();
+      showToast(`Location detected: ${city}`);
+    } else {
+      showToast('Could not detect a nearby metro city');
+    }
+  }, () => {
+    showToast('Unable to detect your location');
+  }, {timeout:8000});
+}
+function nearestMetroCity(lat, lon){
+  let best = null;
+  let bestDist = Infinity;
+  for(const city of METRO_CITIES){
+    const coords = METRO_CITY_COORDS[city];
+    if(!coords) continue;
+    const dist = haversineDistance(lat, lon, coords[0], coords[1]);
+    if(dist < bestDist){ bestDist = dist; best = city; }
+  }
+  return best;
+}
+function haversineDistance(lat1, lon1, lat2, lon2){
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+</script>
+
+<!-- DETAIL -->
+<div class="view" id="view-detail">
+  <div class="wrap" style="padding-top:32px;">
+    <button class="back-link" onclick="go('browse')">← Back to browse</button>
+    <div class="detail-card" id="detail-card"></div>
+  </div>
+</div>
+
+<!-- CALL SCREEN -->
+<div class="view" id="view-call">
+  <div class="wrap" style="padding-top:32px;">
+    <button class="back-link" onclick="backFromCall()">← End &amp; go back</button>
+    <div class="detail-card call-screen" id="call-card"></div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="view" id="view-chat">
+  <div class="wrap" style="padding-top:32px;">
+    <button class="back-link" onclick="go('detail')">← Back to profile</button>
+    <div class="chat-layout" id="chat-layout"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="view" id="view-dashboard">
+  <div class="wrap" style="padding-top:32px; max-width:660px; margin:0 auto;">
+    <h2 class="section-title">Your ticket</h2>
+    <p style="color:var(--ink-soft);">Hirers near <strong id="dash-loc"></strong> can find you, message you, or request a call without ever seeing your number.</p>
+    <div id="dash-paused-banner"></div>
+    <div class="stat-row">
+      <div class="stat"><div class="num" id="stat-views">0</div><div class="lbl">Profile views</div></div>
+      <div class="stat"><div class="num" id="stat-chats">0</div><div class="lbl">Chats started</div></div>
+      <div class="stat"><div class="num" id="stat-calls">0</div><div class="lbl">Calls connected</div></div>
+    </div>
+    <div id="completeness-slot"></div>
+    <div id="dashboard-ticket"></div>
+
+    <div class="cta-row" style="margin-top:24px;">
+      <button class="btn btn-amber" onclick="editMyProfile()">✎ Edit my profile</button>
+      <button class="btn btn-primary" onclick="shareMyTicket()">🔗 Share my ticket</button>
+      <button class="btn btn-ghost" onclick="go('settings')">⚙ Privacy &amp; settings</button>
+      <button class="btn btn-ghost" onclick="go('browse')">See how hirers browse →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHORTLIST / HISTORY -->
+<div class="view" id="view-shortlist">
+  <div class="wrap" style="padding-top:32px;">
+    <div class="section-head">
+      <h2 class="section-title">Saved &amp; recent</h2>
+    </div>
+    <p style="color:var(--ink-soft); margin-top:0;">Ranked closest-first from <strong id="shortlist-loc-label"></strong>.</p>
+    <div class="loc-bar">
+      <span class="mono" style="font-size:13px; color:var(--ink-soft);">📍 Ranking from:</span>
+      <select id="shortlist-loc-input" onchange="onShortlistLocationChange(this.value)" aria-label="Rank shortlist from this metro city"></select>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn" id="tab-saved" onclick="setShortlistTab('saved')">♥ Saved</button>
+      <button class="tab-btn" id="tab-recent" onclick="setShortlistTab('recent')">🕘 Recently viewed</button>
+    </div>
+    <div id="shortlist-groups"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="view-settings">
+  <div class="wrap" style="padding-top:32px; max-width:680px; margin:0 auto;">
+    <h2 class="section-title">Settings</h2>
+    <p style="color:var(--ink-soft); margin-top:0 0 16px;">Manage your profile, privacy and app preferences.</p>
+    <div class="settings-tabs" id="settings-tabs"></div>
+    <div id="settings-body"></div>
+  </div>
+</div>
+
+<!-- PUBLISH JOB -->
+<div class="view" id="view-publish-job">
+  <div class="wrap" style="padding-top:32px; max-width:660px; margin:0 auto;">
+    <button class="back-link" onclick="go('home')">← Back</button>
+    <h2 class="section-title">Post a job</h2>
+    <p style="color:var(--ink-soft); margin-top:0;">Find skilled workers for your project. Post what you need and get matched with nearby professionals.</p>
+    <div id="publish-job-form"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<div class="support-bar">
+  <div class="wrap">Need help? Customer support: <a href="tel:+918919494848">+91 89194 94848</a> &nbsp;·&nbsp; <a href="mailto:pawangopallavudya@gmail.com">pawangopallavudya@gmail.com</a></div>
+</div>
+<footer>
+  <div class="wrap"><strong>Kaarigar</strong> — a prototype. OTP, calling and location matching are simulated for this demo; no real numbers are transmitted anywhere.</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- DATA ----------
+const METRO_CITIES = ['Mumbai','Delhi NCR','Bengaluru','Hyderabad','Chennai','Kolkata','Pune'];
+
+const REG_TYPES = [
+  {id:'skilled', icon:'🛠️', name:'Skilled Worker', sub:'Electrician, plumber, carpenter, painter, tailor…'},
+  {id:'labour', icon:'💪', name:'Labour', sub:'Daily-wage, construction, loading, farm work'},
+  {id:'business', icon:'🏢', name:'Business / Contractor', sub:'Register your team, take on bigger jobs'},
+  {id:'tech', icon:'💻', name:'Tech / Freelancer', sub:'Developer, designer, video editor, and other skills'},
+];
+
+const CATEGORIES = [
+  {code:'EL', icon:'⚡', color:'#c9821f', name:'Electrician', type:'skilled'},
+  {code:'PL', icon:'🔧', color:'#2c4257', name:'Plumber', type:'skilled'},
+  {code:'CA', icon:'🪚', color:'#6b4a2f', name:'Carpenter', type:'skilled'},
+  {code:'PT', icon:'🎨', color:'#a8402a', name:'Painter', type:'skilled'},
+  {code:'TA', icon:'🧵', color:'#8a4b8a', name:'Tailor', type:'skilled'},
+  {code:'AC', icon:'❄️', color:'#2f7a8c', name:'AC Repair', type:'skilled'},
+  {code:'CK', icon:'🍳', color:'#c9821f', name:'Cook / Housekeeping', type:'skilled'},
+  {code:'WM', icon:'🛡️', color:'#2c4257', name:'Watchman / Security', type:'labour'},
+  {code:'LB', icon:'🧱', color:'#a8402a', name:'Construction Labour', type:'labour'},
+  {code:'LD', icon:'📦', color:'#6b5b3f', name:'Loading/Unloading', type:'labour'},
+  {code:'FM', icon:'🌾', color:'#3f6b4a', name:'Farm Labour', type:'labour'},
+  {code:'CN', icon:'🏗️', color:'#2c4257', name:'Contractor / Builder', type:'business'},
+  {code:'EV', icon:'🎪', color:'#a8402a', name:'Event Services Co.', type:'business'},
+  {code:'CL', icon:'🧹', color:'#3f6b4a', name:'Cleaning Company', type:'business'},
+  {code:'DV', icon:'💻', color:'#2c4257', name:'Web/App Developer', type:'tech'},
+  {code:'GD', icon:'🖌️', color:'#8a4b8a', name:'Graphic Designer', type:'tech'},
+  {code:'VE', icon:'🎬', color:'#a8402a', name:'Video Editor', type:'tech'},
+];
+
+const TECH_SKILLS = ['React','Node.js','Python','UI/UX Design','Video Editing','SEO','WordPress','Android','Photography','Content Writing'];
+const AVATAR_STYLES = ['⚡','🔧','🪚','🎨','🧵','❄️','🍳','🛡️','🏗️','💻','🖌️','🎬'];
+const AVATAR_COLORS = ['#c9821f','#2c4257','#6b4a2f','#a8402a','#8a4b8a','#2f7a8c','#3f6b4a','#6b5b3f'];
+const QUICK_REPLIES = ['Is this still available?', "What's your rate?", 'Can you come today?', 'Where are you based?'];
+
+const PRICE_BUCKETS = [
+  {id:'all', label:'Any price'},
+  {id:'budget', label:'Budget (≤₹350)'},
+  {id:'mid', label:'Mid-range (₹351–800)'},
+  {id:'premium', label:'Premium (₹800+)'},
+  {id:'quote', label:'On quotation'},
+];
+const AVAIL_OPTIONS = ['all','Full-time','Part-time','On-call'];
+const EXP_BUCKETS = [
+  {id:'all', label:'Any experience'},
+  {id:'junior', label:'0–2 yrs'},
+  {id:'mid', label:'3–5 yrs'},
+  {id:'senior', label:'6+ yrs'},
+];
+
+function catInfo(name){ return CATEGORIES.find(c => c.name === name) || {icon:'🧰', color:'#2c4257', code:'GN'}; }
+
+let workers = [
+  {id:1, name:'Ramesh Pawar', gender:'Male', regType:'skilled', category:'Electrician', city:'Mumbai', dist:0.8, exp:8, rate:'₹400/visit', availability:'On-call', bio:'Home wiring, fan & light fitting, inverter setup. Same-day service.', phone:'9876543210', verified:true, paused:false, views:34, chats:6, calls:3, allowCalls:true, avatar:'⚡', avatarColor:'#c9821f', feedback:[{name:'Sunil K.', stars:5, text:'Fixed my wiring issue quickly, fair price.'}]},
+  {id:2, name:'Sunita Deshmukh', gender:'Female', regType:'skilled', category:'Tailor', city:'Mumbai', dist:1.4, exp:5, rate:'₹150/piece', availability:'Part-time', bio:'Blouse stitching, alterations, school uniforms.', phone:'9876511111', verified:true, paused:false, views:21, chats:4, calls:0, allowCalls:false, avatar:'🧵', avatarColor:'#8a4b8a', feedback:[{name:'Radha M.', stars:5, text:'Neat stitching, delivered on time.'}]},
+  {id:3, name:'Vikas Chavan', gender:'Male', regType:'skilled', category:'Plumber', city:'Pune', dist:4, exp:12, rate:'₹350/visit', availability:'On-call', bio:'Pipe fitting, tap repair, bathroom fittings. 24x7 emergency call-out.', phone:'9876522222', verified:true, paused:false, views:47, chats:11, calls:5, allowCalls:true, avatar:'🔧', avatarColor:'#2c4257', feedback:[{name:'Amit D.', stars:4, text:'Came the same evening, solved a leak.'}]},
+  {id:4, name:'Anil More', gender:'Male', regType:'labour', category:'Construction Labour', city:'Mumbai', dist:2.1, exp:6, rate:'₹500/day', availability:'Full-time', bio:'Experienced construction site labour, available for daily or weekly work.', phone:'9876533333', verified:false, paused:false, views:15, chats:2, calls:0, allowCalls:true, avatar:'🧱', avatarColor:'#a8402a', feedback:[]},
+  {id:5, name:'Suresh Jadhav', gender:'Male', regType:'skilled', category:'Carpenter', city:'Bengaluru', dist:3, exp:15, rate:'₹500/day', availability:'On-call', bio:'Custom furniture, modular kitchens, door & window repair.', phone:'9876544444', verified:true, paused:false, views:29, chats:7, calls:2, allowCalls:true, avatar:'🪚', avatarColor:'#6b4a2f', feedback:[]},
+  {id:6, name:'Ganpat Rathod', gender:'Male', regType:'labour', category:'Loading/Unloading', city:'Mumbai', dist:1.9, exp:4, rate:'₹450/day', availability:'Full-time', bio:'Loading/unloading for shops, warehouses and house shifting.', phone:'9876566666', verified:false, paused:false, views:18, chats:5, calls:1, allowCalls:true, avatar:'📦', avatarColor:'#6b5b3f', feedback:[]},
+  {id:7, name:'Shree Constructions', gender:'Team', regType:'business', category:'Contractor / Builder', city:'Mumbai', dist:3.2, exp:14, rate:'On quotation', availability:'Full-time', bio:'Team of 12 for home construction, renovation and tiling contracts.', phone:'9876577777', verified:true, paused:false, views:52, chats:14, calls:9, allowCalls:true, avatar:'🏗️', avatarColor:'#2c4257', feedback:[{name:'Prakash T.', stars:5, text:'Handled our full house renovation well.'}]},
+  {id:8, name:'Kavita Patil', gender:'Female', regType:'skilled', category:'Painter', city:'Pune', dist:2.5, exp:7, rate:'₹40/sqft', availability:'On-call', bio:'Interior & exterior painting, texture work, waterproofing.', phone:'9876588888', verified:true, paused:false, views:22, chats:6, calls:0, allowCalls:false, avatar:'🎨', avatarColor:'#a8402a', feedback:[]},
+  {id:9, name:'Rohan Tech Studio', gender:'Male', regType:'tech', category:'Web/App Developer', city:'Bengaluru', dist:0.5, exp:5, rate:'₹800/hr', availability:'On-call', bio:'React & Node.js developer, builds business websites and apps.', phone:'9876599999', verified:true, paused:false, views:31, skills:['React','Node.js','UI/UX Design'], chats:8, calls:2, allowCalls:true, avatar:'💻', avatarColor:'#2c4257', feedback:[]},
+  {id:10, name:'Meena Kale', gender:'Female', regType:'skilled', category:'AC Repair', city:'Hyderabad', dist:2, exp:6, rate:'₹450/visit', availability:'On-call', bio:'AC installation, gas refill, servicing for split & window units.', phone:'9876500000', verified:false, paused:false, views:14, chats:3, calls:0, allowCalls:false, avatar:'❄️', avatarColor:'#2f7a8c', feedback:[]},
+  {id:11, name:'Priya Wagh', gender:'Female', regType:'tech', category:'Graphic Designer', city:'Delhi NCR', dist:1.1, exp:3, rate:'₹500/hr', availability:'Part-time', bio:'Logos, social media creatives, and brand identity design.', phone:'9876511122', verified:false, paused:false, views:9, skills:['UI/UX Design','Content Writing'], chats:2, calls:0, allowCalls:false, avatar:'🖌️', avatarColor:'#8a4b8a', feedback:[]},
+  {id:12, name:'Farm Hands Group', gender:'Team', regType:'labour', category:'Farm Labour', city:'Pune', dist:4.5, exp:9, rate:'₹400/day', availability:'Full-time', bio:'Group of farm workers available for harvesting and field work.', phone:'9876522211', verified:false, paused:false, views:11, chats:1, calls:0, allowCalls:true, avatar:'🌾', avatarColor:'#3f6b4a', feedback:[]},
+  {id:13, name:'Lata Rane', gender:'Female', regType:'skilled', category:'Cook / Housekeeping', city:'Mumbai', dist:1.2, exp:7, rate:'₹7,000/month', availability:'Full-time', bio:'Daily home cooking (Maharashtrian & North Indian) plus light housekeeping.', phone:'9876533221', verified:true, paused:false, views:19, chats:5, calls:0, allowCalls:false, avatar:'🍳', avatarColor:'#c9821f', feedback:[{name:'Neha S.', stars:5, text:'Reliable and food is always tasty.'}]},
+  {id:14, name:'Baban Solanke', gender:'Male', regType:'labour', category:'Watchman / Security', city:'Mumbai', dist:0.9, exp:10, rate:'₹9,000/month', availability:'Full-time', bio:'Night watchman for societies, shops and warehouses. Ex-security guard, disciplined.', phone:'9876544555', verified:true, paused:false, views:16, chats:3, calls:1, allowCalls:true, avatar:'🛡️', avatarColor:'#2c4257', feedback:[]},
+];
+
+let nextId = 1000;
+
+// ---------- STATE ----------
+let state = {
+  role: null,
+  authStep: 'roletype',
+  regType: 'skilled',
+  presetType: false,
+  phone: '',
+  category: 'all',
+  typeFilter: 'all',
+  priceFilter: 'all',
+  availFilter: 'all',
+  expFilter: 'all',
+  moreFiltersOpen: false,
+  query: '',
+  sort: 'dist',
+  location: 'Mumbai',
+  selectedId: null,
+  myId: null,
+  selectedSkills: [],
+  selectedAvatar: null,
+  editMode: false,
+  savedIds: [],
+  recentlyViewed: [],
+  showSavedOnly: false,
+  showVerifiedOnly: false,
+  showTopRatedOnly: false,
+  shortlistTab: 'saved',
+  chatMessages: {},
+  blockedChats: {},
+  reportOpenFor: null,
+  notifChat: true,
+  notifCalls: true,
+  notifUpdates: true,
+  notifTips: true,
+  homeMode: 'hire',
+  settingsTab: 'profile',
+  notifPanelOpen: false,
+  profilePanelOpen: false,
+  language: 'English',
+  notifications: [
+    {id:1, icon:'✨', title:'Masked calling is here', body:"Talk to hirers or workers without ever sharing your real number.", time:'2 days ago', read:false},
+    {id:2, icon:'📈', title:'Boost your profile', body:'Tickets with a bio, rate and photo style get up to 3x more views.', time:'3 days ago', read:false},
+    {id:3, icon:'🏷️', title:'New: filter by price', body:'Hirers can now filter by price, availability and experience on Browse.', time:'5 days ago', read:false},
+    {id:4, icon:'🛡️', title:'New safety controls', body:'You can switch calls off and go chat-only from Settings any time.', time:'1 week ago', read:true},
+    {id:5, icon:'⭐', title:'Top Rated section added', body:'Your best reviews can now surface on the Kaarigar home page.', time:'1 week ago', read:true},
+  ],
+};
+
+// ---------- NAV ----------
+function navItems(){
+  const items = [
+    {label:'Home', action:"go('home')"},
+    {label:'Browse Nearby', action:"go('browse')"},
+    {label:'Saved & Recent', action:"go('shortlist')"},
+    {label:'Messages', action:"goToChatList()"},
+    {label:'Settings', action:"go('settings')"},
+  ];
+  return items;
+}
+function renderNav(){
+  const html = navItems().map(i => `<button class="nav-btn" onclick="${i.action}; closeMobileMenu();">${i.label}</button>`).join('');
+  document.getElementById('nav-links-desktop').innerHTML = html;
+  renderNavRight();
+  const mobileExtra = state.myId
+    ? `<button class="nav-btn" onclick="go('dashboard'); closeMobileMenu();">👤 My Ticket</button>`
+    : `<button class="nav-btn" onclick="openAuth('worker'); closeMobileMenu();">Register / Sign in</button>`;
+  document.getElementById('mobile-menu').innerHTML = html + mobileExtra;
+}
+
+function renderNavRight(){
+  const unread = state.notifications.filter(n => !n.read).length;
+  const mine = state.myId ? workers.find(w => w.id === state.myId) : null;
+
+  let notifPanel = '';
+  if(state.notifPanelOpen){
+    const items = state.notifications.length
+      ? state.notifications.map(n => `
+          <div class="notif-item ${n.read?'':'unread'}" onclick="openNotification(${n.id})">
+            <div class="notif-ic">${n.icon}</div>
+            <div class="notif-body-txt">
+              <div class="notif-title-row">${!n.read?'<span class="unread-dot"></span>':''}${n.title}</div>
+              <div class="notif-desc">${n.body}</div>
+              <div class="notif-time">${n.time}</div>
+            </div>
+          </div>
+        `).join('')
+      : `<div class="notif-empty">You're all caught up.</div>`;
+    notifPanel = `
+      <div class="dropdown-panel">
+        <div class="dropdown-head"><h4>Notifications &amp; updates</h4><button class="link-btn" onclick="markAllNotifRead()">Mark all read</button></div>
+        ${items}
+      </div>
+    `;
+  }
+
+  let profilePanel = '';
+  if(state.profilePanelOpen){
+    if(mine){
+      profilePanel = `
+        <div class="dropdown-panel">
+          <div class="profile-menu-head">
+            <div class="avatar-circle avatar-sm" style="background:${mine.avatarColor};">${mine.avatar}</div>
+            <div><div class="pmh-name">${mine.name}</div><div class="pmh-sub">${mine.category} · ${mine.city}</div></div>
+          </div>
+          <button class="profile-menu-item" onclick="go('dashboard')">📋 My dashboard</button>
+          <button class="profile-menu-item" onclick="editMyProfile()">✎ Edit profile</button>
+          <button class="profile-menu-item" onclick="go('settings')">⚙ Settings</button>
+          <button class="profile-menu-item danger" onclick="signOut()">↩ Sign out</button>
+        </div>
+      `;
+    } else {
+      profilePanel = `
+        <div class="dropdown-panel">
+          <div class="profile-menu-head"><div><div class="pmh-name">You're not registered yet</div><div class="pmh-sub">Create a ticket to be found by hirers</div></div></div>
+          <button class="profile-menu-item" onclick="openAuth('worker')">🛠 Register to find work</button>
+          <button class="profile-menu-item" onclick="go('settings')">⚙ Settings</button>
+        </div>
+      `;
+    }
+  }
+
+  const avatarBtn = mine
+    ? `<button class="avatar-btn" aria-label="My profile" onclick="toggleProfilePanel()"><div class="avatar-circle avatar-sm" style="background:${mine.avatarColor};">${mine.avatar}</div></button>`
+    : `<button class="get-started-btn" onclick="toggleProfilePanel()">Get started</button>`;
+
+  document.getElementById('nav-right').innerHTML = `
+    <div class="panel-anchor">
+      <button class="icon-pill" aria-label="Notifications" onclick="toggleNotifPanel()">🔔${unread ? `<span class="notif-badge">${unread}</span>` : ''}</button>
+      ${notifPanel}
+    </div>
+    <div class="panel-anchor">
+      ${avatarBtn}
+      ${profilePanel}
+    </div>
+  `;
+}
+
+function toggleNotifPanel(){ state.notifPanelOpen = !state.notifPanelOpen; state.profilePanelOpen = false; renderNavRight(); }
+function toggleProfilePanel(){ state.profilePanelOpen = !state.profilePanelOpen; state.notifPanelOpen = false; renderNavRight(); }
+function closeAllPanels(){ state.notifPanelOpen = false; state.profilePanelOpen = false; }
+function markAllNotifRead(){ state.notifications.forEach(n => n.read = true); renderNavRight(); }
+function openNotification(id){ const n = state.notifications.find(x=>x.id===id); if(n) n.read = true; renderNavRight(); }
+function signOut(){ state.myId = null; closeAllPanels(); go('home'); showToast('Signed out'); }
+
+function toggleMobileMenu(){ document.getElementById('mobile-menu').classList.toggle('open'); }
+function closeMobileMenu(){ document.getElementById('mobile-menu').classList.remove('open'); }
+
+function goProfile(){
+  if(state.myId){ go('dashboard'); }
+  else openAuth('worker');
+}
+
+function go(view){
+  closeAllPanels();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderNav();
+  if(view === 'home'){ renderHome(); }
+  if(view === 'browse') renderBrowse();
+  if(view === 'shortlist') renderShortlist();
+  if(view === 'settings') renderSettings();
+  if(view === 'dashboard') renderDashboard();
+}
+
+function goToChatList(){
+  if(state.selectedId === null){
+    const anyId = Object.keys(state.chatMessages)[0];
+    if(anyId) state.selectedId = parseInt(anyId, 10);
+  }
+  go('chat');
+  renderChat();
+}
+
+function openAuth(role, presetType){
+  state.role = role;
+  state.presetType = !!presetType;
+  if(presetType){ state.regType = presetType; state.authStep = 'phone'; }
+  else state.authStep = role === 'worker' ? 'roletype' : 'phone';
+  state.phone = '';
+  state.selectedAvatar = null;
+  state.editMode = false;
+  state.myId = null;
+  go('auth');
+  renderAuth();
+}
+
+function editMyProfile(){
+  const w = workers.find(x => x.id === state.myId);
+  if(!w) return;
+  state.role = 'worker';
+  state.regType = w.regType;
+  state.phone = w.phone;
+  state.editMode = true;
+  state.selectedSkills = w.skills ? [...w.skills] : [];
+  state.selectedAvatar = findAvatarIndex(w.avatar);
+  state.authStep = 'profile';
+  go('auth');
+  renderAuth();
+}
+
+function findAvatarIndex(emoji){
+  const i = AVATAR_STYLES.indexOf(emoji);
+  return i === -1 ? 0 : i;
+}
+function findWorkerByPhone(phone, excludeId){
+  return workers.find(w => w.phone === phone && w.id !== excludeId);
+}
+function avgRating(w){
+  if(!w.feedback || !w.feedback.length) return null;
+  return w.feedback.reduce((s,f)=>s+f.stars,0) / w.feedback.length;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ---------- MODAL ----------
+function openModal(html){
+  document.getElementById('modal-box').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+
+function renderCatGrid(){
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = CATEGORIES.map(c => `
+    <button class="cat-card" onclick="jumpToCategory('${c.name}')">
+      <div class="cat-badge" style="background:${c.color};">${c.icon}</div>
+      <span class="cname">${c.name}</span>
+    </button>
+  `).join('');
+}
+function jumpToCategory(name){ state.category = name; go('browse'); }
+
+function renderRegTypeGrid(){
+  const grid = document.getElementById('reg-type-grid');
+  grid.innerHTML = REG_TYPES.map(t => `
+    <div class="role-card clickable" onclick="openAuth('worker','${t.id}')">
+      <div class="rc-icon">${t.icon}</div>
+      <div class="rc-title">${t.name}</div>
+      <div class="rc-sub">${t.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ---------- HOME (split by mode: hire vs find work) ----------
+function setHomeMode(mode){ state.homeMode = mode; renderHome(); }
+
+function renderHome(){
+  document.getElementById('mode-btn-hire').classList.toggle('active', state.homeMode==='hire');
+  document.getElementById('mode-btn-work').classList.toggle('active', state.homeMode==='work');
+  renderHeroGrid();
+  renderTopRatedSection();
+  renderCatGrid();
+  renderRegTypeGrid();
+  renderStepsGrid();
+  document.getElementById('reg-grid-title').textContent = state.homeMode === 'work' ? 'Four ways to register' : 'Who you can hire';
+}
+
+function renderHeroGrid(){
+  const grid = document.getElementById('hero-grid');
+  const mine = state.myId ? workers.find(w => w.id === state.myId) : null;
+
+  if(state.homeMode === 'work'){
+    grid.innerHTML = `
+      <div>
+        <span class="eyebrow">Free to list · get found nearby first</span>
+        <h1>Get work.<br>Not just a listing.</h1>
+        <p class="lead">Create your ticket in under two minutes. Hirers near you see your profile before anyone farther away, and every conversation stays inside secure chat or a masked call — your number is never shown.</p>
+        <div class="cta-row"><button class="btn btn-amber" onclick="openAuth('worker')">Register to Find Work →</button></div>
+        <ul class="hero-benefit-list">
+          <li><span class="hb-ic">📍</span>Shown to nearby hirers first, so you get found faster</li>
+          <li><span class="hb-ic">🔐</span>Your phone number is never shown to anyone</li>
+          <li><span class="hb-ic">★</span>Build a rating from real feedback after each job</li>
+        </ul>
+      </div>
+      <div>
+        <div class="hero-your-label" id="hero-ticket-label">${mine ? 'This is your live ticket' : 'A sample ticket — yours could look like this'}</div>
+        <div id="hero-ticket-slot"></div>
+        <div class="hero-cta-under" id="hero-cta-under"></div>
+      </div>
+    `;
+  } else {
+    grid.innerHTML = `
+      <div>
+        <span class="eyebrow">Local workers</span>
+        <h1>Find top-rated help nearby.</h1>
+        <p class="lead"> </p>
+        <div class="cta-row"><button class="btn btn-primary" onclick="openAuth('hirer')">Hire Someone Nearby →</button></div>
+        <ul class="hero-benefit-list">
+          <li><span class="hb-ic">📍</span>Closest, verified matches surface first</li>
+          <li><span class="hb-ic">☎️</span>Masked calls need the worker's approval</li>
+          <li><span class="hb-ic">★</span>Real reviews from past hirers on every ticket</li>
+        </ul>
+      </div>
+      <div>
+        <div class="hero-your-label" id="hero-ticket-label">A sample ticket</div>
+        <div id="hero-ticket-slot"></div>
+        <div class="hero-cta-under" id="hero-cta-under"></div>
+      </div>
+    `;
+  }
+
+  const label = document.getElementById('hero-ticket-label');
+  const slot = document.getElementById('hero-ticket-slot');
+  const under = document.getElementById('hero-cta-under');
+
+  if(state.homeMode === 'work' && mine){
+    slot.innerHTML = ticketCardHtml(mine, true);
+    under.innerHTML = `<button class="btn btn-primary btn-sm" onclick="go('dashboard')">Go to my dashboard →</button>`;
+  } else {
+    // for hirers, prefer showing the top-rated profile first in the hero slot
+    const topRated = workers.filter(w => !w.paused && avgRating(w) !== null).sort((a,b) => (avgRating(b)-avgRating(a)) || (b.feedback.length-a.feedback.length))[0];
+    const sample = topRated || {
+      id:1, name:'Ramesh Pawar', gender:'Male', regType:'skilled', category:'Electrician', city:'Mumbai',
+      dist:0.8, exp:8, rate:'₹400/visit', availability:'On-call',
+      bio:'Home wiring, fan & light fitting, inverter setup. Same-day service.',
+      verified:true, paused:false, avatar:'⚡', avatarColor:'#c9821f', feedback:[]
+    };
+    slot.innerHTML = ticketCardHtml(sample, false);
+    under.innerHTML = state.homeMode === 'work'
+      ? `<button class="btn btn-amber btn-sm" onclick="openAuth('worker')">Create your ticket →</button>`
+      : `<button class="btn btn-amber btn-sm" onclick="go('browse')">Browse workers near you →</button>`;
+  }
+}
+
+function renderStepsGrid(){
+  const grid = document.getElementById('steps-grid');
+  document.getElementById('steps-title').textContent = state.homeMode === 'work' ? 'How it works for workers' : 'How it works for hirers';
+  const steps = state.homeMode === 'work' ? [
+    {t:'STEP 1', h:'Verify your number', p:"Sign up with OTP. Your number is used only to verify you — it's never shown publicly."},
+    {t:'STEP 2', h:'Build your ticket', p:'Add your photo style, trade, rate and a short bio so hirers know exactly what you offer.'},
+    {t:'STEP 3', h:'Respond fast', p:'Chat in-app, or approve a masked call request. Your number stays hidden the whole time.'},
+  ] : [
+    {t:'STEP 1', h:'Verify your number', p:"Sign up with OTP. Your number is used only to verify you — it's never shown publicly."},
+    {t:'STEP 2', h:'Pick your metro city', p:'You see workers closest to you first, so nearby people get found faster.'},
+    {t:'STEP 3', h:'Chat, or request a call', p:'Message in-app, or request a masked call the worker must approve. Numbers stay hidden on both sides.'},
+  ];
+  grid.innerHTML = steps.map(s => `<div class="step"><div class="num">${s.t}</div><h3>${s.h}</h3><p>${s.p}</p></div>`).join('');
+}
+
+function renderTopRatedSection(){
+  const list = workers.filter(w => !w.paused && avgRating(w) !== null).sort((a,b) => (avgRating(b)-avgRating(a)) || (b.feedback.length-a.feedback.length)).slice(0,6);
+  const scroll = document.getElementById('top-rated-scroll');
+  if(!list.length){
+    document.getElementById('top-rated-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('top-rated-section').style.display = '';
+  scroll.innerHTML = list.map(w => ticketCardHtml(w, true)).join('');
+}
+
+// ---------- AUTH FLOW ----------
+function renderAuth(){
+  const card = document.getElementById('auth-card');
+
+  if(state.role === 'worker' && state.authStep === 'roletype'){
+    card.innerHTML = `
+      <div class="progress-track"><div class="progress-seg done"></div><div class="progress-seg"></div><div class="progress-seg"></div></div>
+      <h3 style="margin-top:0;">How do you want to register?</h3>
+      <div class="role-grid" style="grid-template-columns:repeat(2,1fr);">
+        ${REG_TYPES.map(t => `
+          <div class="role-card clickable ${state.regType===t.id?'selected':''}" onclick="setRegType('${t.id}')">
+            <div class="rc-icon">${t.icon}</div>
+            <div class="rc-title">${t.name}</div><div class="rc-sub">${t.sub}</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="state.authStep='phone'; renderAuth();">Continue</button>
+    `;
+    return;
+  }
+
+  if(state.authStep === 'phone'){
+    card.innerHTML = `
+      <div class="progress-track"><div class="progress-seg done"></div><div class="progress-seg"></div><div class="progress-seg"></div></div>
+      <label style="margin-top:0;">Mobile number</label>
+      <input type="tel" id="phone-input" maxlength="10" placeholder="98765 43210" value="${state.phone}">
+      <div class="hint">We'll never show this number to anyone. It's only for OTP verification and account recovery.</div>
+      <button class="btn btn-primary btn-block" onclick="sendOtp()">Send OTP</button>
+    `;
+  } else if(state.authStep === 'otp'){
+    card.innerHTML = `
+      <div class="progress-track"><div class="progress-seg done"></div><div class="progress-seg done"></div><div class="progress-seg"></div></div>
+      <p style="margin-top:0;">OTP sent to <strong class="mono">+91 ${state.phone}</strong></p>
+      <div class="hint">Demo mode — enter any 4 digits to continue.</div>
+      <label>Enter OTP</label>
+      <input type="text" id="otp-input" maxlength="4" placeholder="1234">
+      <button class="btn btn-primary btn-block" onclick="verifyOtp()">Verify &amp; Continue</button>
+      <button class="nav-btn" style="color:var(--indigo); margin-top:10px;" onclick="state.authStep='phone'; renderAuth();">Change number</button>
+    `;
+  } else if(state.authStep === 'profile'){
+    const catsForType = CATEGORIES.filter(c => c.type === state.regType);
+    const existing = state.editMode ? workers.find(w => w.id === state.myId) : null;
+    const v = (field, fallback) => existing ? (existing[field] ?? fallback) : (fallback ?? '');
+    const opt = (value, label, current) => `<option value="${value}" ${value===current?'selected':''}>${label}</option>`;
+
+    card.innerHTML = `
+      ${!state.editMode ? `<div class="progress-track"><div class="progress-seg done"></div><div class="progress-seg done"></div><div class="progress-seg done"></div></div>` : ''}
+      <h3 style="margin-top:0;">${state.editMode ? 'Edit your profile' : 'Profile basics'}</h3>
+      ${state.editMode ? `<div class="hint" style="margin-top:-4px;">Editing TCKT-${String(existing.id).padStart(4,'0')}. Changes save straight to your live ticket.</div>` : ''}
+
+      <label>Profile photo <span class="required-star">*</span></label>
+      <div class="hint" style="margin-top:-4px;">Pick a style so hirers can recognise you at a glance.</div>
+      <div class="avatar-picker" id="avatar-picker">
+        ${AVATAR_STYLES.map((a,i) => `
+          <div class="avatar-option ${state.selectedAvatar===i?'selected':''}" onclick="pickAvatar(${i})">
+            <div class="avatar-circle avatar-sm" style="background:${AVATAR_COLORS[i % AVATAR_COLORS.length]}; margin:0 auto 6px;">${a}</div>
+            <span>Style ${i+1}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <label>${state.regType==='business' ? 'Business / Team name' : 'Full name'}</label>
+      <input type="text" id="p-name" placeholder="e.g. Ramesh Pawar" value="${v('name','')}">
+
+      ${state.regType !== 'business' ? `
+        <label>Gender</label>
+        <select id="p-gender">
+          ${opt('Male','Male', v('gender','Male'))}
+          ${opt('Female','Female', v('gender','Male'))}
+          ${opt('Other','Other', v('gender','Male'))}
+        </select>
+      ` : ''}
+
+      ${state.regType === 'tech' ? `
+        <label>Your skills (select all that apply)</label>
+        <div class="tagbox" id="skill-tagbox">
+          ${TECH_SKILLS.map(s => `<button type="button" class="skill-chip ${state.selectedSkills.includes(s)?'active':''}" onclick="toggleSkill('${s}', this)">${s}</button>`).join('')}
+        </div>
+        <label>Primary category</label>
+        <select id="p-category">${catsForType.map(c=>opt(c.name, c.name, v('category', catsForType[0] && catsForType[0].name))).join('')}</select>
+      ` : `
+        <label>Trade / category</label>
+        <select id="p-category">${catsForType.map(c=>opt(c.name, c.name, v('category', catsForType[0] && catsForType[0].name))).join('')}</select>
+      `}
+
+      <label>Metro city</label>
+      <select id="p-city">${METRO_CITIES.map(c=>opt(c, c, v('city','Mumbai'))).join('')}</select>
+
+      ${state.regType === 'business' ? `
+        <label>Team size</label>
+        <input type="number" id="p-teamsize" placeholder="e.g. 8" value="${v('exp','')}">
+      ` : `
+        <label>Years of experience</label>
+        <input type="number" id="p-exp" placeholder="e.g. 5" value="${v('exp','')}">
+      `}
+
+      <label>Rate (optional)</label>
+      <input type="text" id="p-rate" placeholder="e.g. ₹400/visit or On quotation" value="${v('rate','')}">
+
+      <label>Availability</label>
+      <select id="p-availability">
+        ${opt('Full-time','Full-time', v('availability','Full-time'))}
+        ${opt('Part-time','Part-time', v('availability','Full-time'))}
+        ${opt('On-call','On-call', v('availability','Full-time'))}
+      </select>
+
+      <label>Short description</label>
+      <textarea id="p-bio" rows="3" placeholder="What work do you do, and what should hirers know?">${v('bio','')}</textarea>
+      <button class="btn btn-amber btn-block" style="margin-top:16px;" onclick="createProfile()">${state.editMode ? 'Save changes' : 'Publish my ticket'}</button>
+      ${state.editMode ? `<button class="nav-btn" style="color:var(--indigo); margin-top:10px;" onclick="go('dashboard')">Cancel</button>` : ''}
+    `;
+  }
+}
+
+function pickAvatar(i){
+  state.selectedAvatar = i;
+  document.querySelectorAll('#avatar-picker .avatar-option').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+}
+function setRegType(id){ state.regType = id; state.selectedSkills = []; renderAuth(); }
+function toggleSkill(skill, btn){
+  const i = state.selectedSkills.indexOf(skill);
+  if(i === -1){ state.selectedSkills.push(skill); btn.classList.add('active'); }
+  else { state.selectedSkills.splice(i,1); btn.classList.remove('active'); }
+}
+
+function sendOtp(){
+  const val = document.getElementById('phone-input').value.trim();
+  if(val.length < 10){ showToast('Enter a valid 10-digit mobile number'); return; }
+  state.phone = val;
+  state.authStep = 'otp';
+  renderAuth();
+  showToast('OTP sent (demo)');
+}
+
+function verifyOtp(){
+  const val = document.getElementById('otp-input').value.trim();
+  if(val.length < 4){ showToast('Enter the 4-digit OTP'); return; }
+  if(state.role === 'worker'){
+    const existing = findWorkerByPhone(state.phone);
+    if(existing && !state.editMode){
+      state.myId = existing.id;
+      state.regType = existing.regType;
+      state.editMode = true;
+      state.selectedSkills = existing.skills ? [...existing.skills] : [];
+      state.selectedAvatar = findAvatarIndex(existing.avatar);
+      showToast(`This number already has a profile (${existing.name}) — opening it to edit.`);
+    } else {
+      state.myId = null;
+      state.editMode = false;
+    }
+    state.authStep = 'profile';
+    renderAuth();
+  } else {
+    showToast('Number verified — welcome!');
+    go('browse');
+  }
+}
+
+function createProfile(){
+  if(state.selectedAvatar === null){ showToast('Please choose a profile photo style'); return; }
+  const name = document.getElementById('p-name').value.trim();
+  const category = document.getElementById('p-category').value;
+  const city = document.getElementById('p-city').value;
+  const rate = document.getElementById('p-rate').value.trim() || 'Ask for rate';
+  const availability = document.getElementById('p-availability').value;
+  const bio = document.getElementById('p-bio').value.trim() || 'Available for work — get in touch to discuss details.';
+  const exp = state.regType === 'business' ? (document.getElementById('p-teamsize').value.trim() || '1') : (document.getElementById('p-exp').value.trim() || '0');
+  const gender = state.regType === 'business' ? 'Team' : document.getElementById('p-gender').value;
+
+  if(!name){ showToast('Please enter a name'); return; }
+
+  const avatar = AVATAR_STYLES[state.selectedAvatar % AVATAR_STYLES.length];
+  const avatarColor = AVATAR_COLORS[state.selectedAvatar % AVATAR_COLORS.length];
+  const skills = state.regType === 'tech' ? [...state.selectedSkills] : undefined;
+
+  if(state.editMode){
+    const w = workers.find(x => x.id === state.myId);
+    if(!w){ showToast('Could not find your profile to update'); return; }
+    Object.assign(w, { name, gender, category, city, exp: parseInt(exp)||0, rate, availability, bio, avatar, avatarColor, skills });
+    state.location = city;
+    go('dashboard');
+    showToast('Your profile has been updated');
+    return;
+  }
+
+  const duplicate = findWorkerByPhone(state.phone);
+  if(duplicate){
+    state.myId = duplicate.id;
+    state.editMode = true;
+    showToast(`+91 ${state.phone} is already registered as ${duplicate.name}. Redirected you to edit that profile instead.`);
+    state.selectedSkills = duplicate.skills ? [...duplicate.skills] : [];
+    state.selectedAvatar = findAvatarIndex(duplicate.avatar);
+    renderAuth();
+    return;
+  }
+
+  const id = nextId++;
+  const worker = {
+    id, name, gender, regType: state.regType, category, city, dist: 0.4, exp: parseInt(exp)||0, rate, availability, bio,
+    phone: state.phone, verified:false, paused:false, views:0, chats:0, calls:0,
+    allowCalls: gender === 'Female' ? false : true,
+    avatar, avatarColor, feedback:[], skills,
+  };
+  workers.unshift(worker);
+  state.myId = id;
+  state.location = city;
+  go('dashboard');
+  showToast('Your ticket is published!');
+}
+
+// ---------- DISTANCE ----------
+function effectiveDist(w){
+  return w.city === state.location ? w.dist : w.dist + 500;
+}
+function distLabel(w){
+  const d = effectiveDist(w);
+  if(d < 3) return {cls:'dist-near', text:`● ${d.toFixed(1)} km away${w.city===state.location ? ' · Direct' : ''}`};
+  if(d < 15) return {cls:'dist-city', text:`● ${d.toFixed(1)} km · Same city${w.city===state.location ? ' · Direct' : ''}`};
+  return {cls:'dist-far', text:`● Outside ${state.location}`};
+}
+
+// ---------- PRICE / EXPERIENCE HELPERS ----------
+function parseRateValue(w){
+  const m = (w.rate || '').match(/₹\s?([\d,]+)/);
+  if(!m) return null;
+  return parseInt(m[1].replace(/,/g,''), 10);
+}
+function priceBucket(w){
+  const n = parseRateValue(w);
+  if(n === null) return 'quote';
+  if(n <= 350) return 'budget';
+  if(n <= 800) return 'mid';
+  return 'premium';
+}
+function expBucket(w){
+  if(w.exp <= 2) return 'junior';
+  if(w.exp <= 5) return 'mid';
+  return 'senior';
+}
+
+// ---------- FAVOURITES ----------
+function toggleSave(id, evt){
+  if(evt) evt.stopPropagation();
+  const i = state.savedIds.indexOf(id);
+  if(i === -1){ state.savedIds.push(id); showToast('Saved to favourites'); }
+  else { state.savedIds.splice(i,1); showToast('Removed from favourites'); }
+  if(document.getElementById('view-home').classList.contains('active')) renderTopRatedSection();
+  if(document.getElementById('view-browse').classList.contains('active')) renderBrowse();
+  if(document.getElementById('view-detail').classList.contains('active')) renderDetail();
+  if(document.getElementById('view-shortlist').classList.contains('active')) renderShortlist();
+}
+function toggleSavedFilter(){ state.showSavedOnly = !state.showSavedOnly; renderBrowse(); }
+function toggleVerifiedFilter(){ state.showVerifiedOnly = !state.showVerifiedOnly; renderBrowse(); }
+function toggleTopRatedFilter(){ state.showTopRatedOnly = !state.showTopRatedOnly; renderBrowse(); }
+function toggleMoreFilters(){
+  state.moreFiltersOpen = !state.moreFiltersOpen;
+  document.getElementById('more-filters-body').style.display = state.moreFiltersOpen ? 'block' : 'none';
+  document.getElementById('more-filters-btn').textContent = (state.moreFiltersOpen ? '▾' : '▸') + ' More filters (price, availability, experience)';
+}
+function onSortChange(v){ state.sort = v; renderBrowse(); }
+
+// ---------- CARD ----------
+function catCode(categoryName){ return catInfo(categoryName).code; }
+function regTypeLabel(id){ const t = REG_TYPES.find(r=>r.id===id); return t ? t.name : id; }
+
+function ticketCardHtml(w, clickable){
+  const d = distLabel(w);
+  const isSaved = state.savedIds.includes(w.id);
+  const skillLine = w.skills ? `<div class="skill-pills">${w.skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>` : '';
+  const rating = avgRating(w);
+  const ratingLine = rating ? `<div class="rating-line">★ ${rating.toFixed(1)} · ${w.feedback.length} review${w.feedback.length>1?'s':''}</div>` : '';
+  const pausedChip = w.paused ? `<span class="paused-chip">On hold</span>` : '';
+  return `
+    <div class="ticket ${clickable ? 'clickable' : ''}" ${clickable ? `onclick="openDetail(${w.id})"` : ''}>
+      <div class="ticket-main">
+        <div class="card-top-row">
+          <div class="avatar-circle avatar-md" style="background:${w.avatarColor};" aria-hidden="true">${w.avatar}${w.verified ? '<span class="avatar-check">✓</span>' : ''}</div>
+          <div class="card-headline">
+            <div class="dist-pill ${d.cls}">${d.text}</div>
+            <div class="profession-title">${w.category}<span class="gender-pill">${w.gender}</span></div>
+            <div class="worker-subname">${w.name} · ${regTypeLabel(w.regType)}${w.verified ? '<span class="verified-chip">✓ Verified</span>' : ''}${pausedChip}</div>
+          </div>
+          ${clickable ? `<button class="fav-btn ${isSaved?'active':''}" aria-label="${isSaved?'Remove from favourites':'Save to favourites'}" onclick="toggleSave(${w.id}, event)">${isSaved?'♥':'♡'}</button>` : ''}
+        </div>
+        <div class="worker-meta">${w.exp} ${w.regType==='business'?'people team':'yrs experience'} · ${w.city}<span class="avail-chip">${w.availability||'Flexible'}</span></div>
+        ${ratingLine}
+        ${skillLine}
+        <div class="rate-highlight">${w.rate}</div>
+        <p class="worker-bio">${w.bio}</p>
+      </div>
+      <div class="ticket-num-row mono">
+        <span>TCKT-${String(w.id).padStart(4,'0')}</span>
+        <span>${catCode(w.category)}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- BROWSE ----------
+function renderTypeChips(){
+  const row = document.getElementById('type-chip-row');
+  const types = [{id:'all', name:'All types'}, ...REG_TYPES];
+  row.innerHTML = types.map(t => `
+    <button class="chip ${state.typeFilter===t.id?'active':''}" onclick="setTypeFilter('${t.id}')">${t.name}</button>
+  `).join('');
+}
+function setTypeFilter(id){ state.typeFilter = id; renderBrowse(); }
+
+function renderChips(){
+  const row = document.getElementById('chip-row');
+  const cats = ['all', ...CATEGORIES.filter(c => state.typeFilter==='all' || c.type===state.typeFilter).map(c=>c.name)];
+  row.innerHTML = cats.map(c => `
+    <button class="chip ${state.category===c?'active':''}" onclick="setCategory('${c}')">${c==='all'?'All trades':c}</button>
+  `).join('');
+}
+function setCategory(c){ state.category = c; renderBrowse(); }
+
+function renderPriceChips(){
+  const row = document.getElementById('price-chip-row');
+  row.innerHTML = PRICE_BUCKETS.map(b => `<button class="chip ${state.priceFilter===b.id?'active':''}" onclick="setPriceFilter('${b.id}')">${b.label}</button>`).join('');
+}
+function setPriceFilter(id){ state.priceFilter = id; renderBrowse(); }
+
+function renderAvailChips(){
+  const row = document.getElementById('avail-chip-row');
+  row.innerHTML = AVAIL_OPTIONS.map(a => `<button class="chip ${state.availFilter===a?'active':''}" onclick="setAvailFilter('${a}')">${a==='all'?'Any availability':a}</button>`).join('');
+}
+function setAvailFilter(a){ state.availFilter = a; renderBrowse(); }
+
+function renderExpChips(){
+  const row = document.getElementById('exp-chip-row');
+  row.innerHTML = EXP_BUCKETS.map(b => `<button class="chip ${state.expFilter===b.id?'active':''}" onclick="setExpFilter('${b.id}')">${b.label}</button>`).join('');
+}
+function setExpFilter(id){ state.expFilter = id; renderBrowse(); }
+
+function onSearch(v){ state.query = v.toLowerCase(); renderBrowse(); }
+function onLocationChange(v){ state.location = v; renderBrowse(); }
+
+function populateLocationSelect(){
+  const sel = document.getElementById('loc-input');
+  if(!sel.dataset.filled){
+    sel.innerHTML = METRO_CITIES.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.dataset.filled = '1';
+  }
+  sel.value = state.location;
+}
+
+function sortResults(results){
+  if(state.sort === 'exp') return results.sort((a,b) => b.exp - a.exp);
+  if(state.sort === 'rating') return results.sort((a,b) => (avgRating(b)||0) - (avgRating(a)||0));
+  if(state.sort === 'price_low') return results.sort((a,b) => (parseRateValue(a) ?? 999999) - (parseRateValue(b) ?? 999999));
+  if(state.sort === 'price_high') return results.sort((a,b) => (parseRateValue(b) ?? -1) - (parseRateValue(a) ?? -1));
+  return results.sort((a,b) => effectiveDist(a) - effectiveDist(b));
+}
+
+function renderBrowse(){
+  populateLocationSelect();
+  renderTypeChips();
+  renderChips();
+  renderPriceChips();
+  renderAvailChips();
+  renderExpChips();
+  document.getElementById('search-input').value = state.query;
+  document.getElementById('saved-chip').classList.toggle('active', state.showSavedOnly);
+  document.getElementById('verified-chip').classList.toggle('active', state.showVerifiedOnly);
+  document.getElementById('toprated-chip').classList.toggle('active', state.showTopRatedOnly);
+  document.getElementById('sort-input').value = state.sort;
+  document.getElementById('more-filters-body').style.display = state.moreFiltersOpen ? 'block' : 'none';
+
+  let results = workers.filter(w => {
+    if(w.paused) return false; // paused tickets are hidden from hirers
+    const matchesType = state.typeFilter === 'all' || w.regType === state.typeFilter;
+    const matchesCat = state.category === 'all' || w.category === state.category;
+    const matchesPrice = state.priceFilter === 'all' || priceBucket(w) === state.priceFilter;
+    const matchesAvail = state.availFilter === 'all' || w.availability === state.availFilter;
+    const matchesExp = state.expFilter === 'all' || expBucket(w) === state.expFilter;
+    const q = state.query || '';
+    const matchesQuery = !q || w.name.toLowerCase().includes(q) || w.category.toLowerCase().includes(q) || w.city.toLowerCase().includes(q) || (w.skills && w.skills.join(' ').toLowerCase().includes(q));
+    const matchesSaved = !state.showSavedOnly || state.savedIds.includes(w.id);
+    const matchesVerified = !state.showVerifiedOnly || w.verified;
+    const matchesTopRated = !state.showTopRatedOnly || (avgRating(w) !== null && avgRating(w) >= 4.5);
+    return matchesType && matchesCat && matchesPrice && matchesAvail && matchesExp && matchesQuery && matchesSaved && matchesVerified && matchesTopRated;
+  });
+
+  results = sortResults(results);
+  document.getElementById('result-count').textContent = `${results.length} worker${results.length===1?'':'s'} near ${state.location}`;
+
+  const groups = document.getElementById('browse-groups');
+  if(results.length === 0){
+    const msg = state.showSavedOnly
+      ? { icon:'♡', text:"You haven't saved anyone yet. Tap the heart on a profile to save it here." }
+      : { icon:'🔍', text:'No one matches that search yet. Try a different trade, or widen your filters.' };
+    groups.innerHTML = `<div class="empty-state"><div class="es-icon">${msg.icon}</div>${msg.text}</div>`;
+    return;
+  }
+
+  if(state.sort !== 'dist'){
+    groups.innerHTML = `<div class="grid-list">${results.map(w=>ticketCardHtml(w,true)).join('')}</div>`;
+    return;
+  }
+
+  const near = results.filter(w => effectiveDist(w) < 3);
+  const city = results.filter(w => effectiveDist(w) >= 3 && effectiveDist(w) < 15);
+  const far = results.filter(w => effectiveDist(w) >= 15);
+
+  let html = '';
+  if(near.length){ html += `<div class="group-label">Near you</div><div class="grid-list">${near.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  if(city.length){ html += `<div class="group-label">Same city</div><div class="grid-list">${city.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  if(far.length){ html += `<div class="group-label">Other metro cities</div><div class="grid-list">${far.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  groups.innerHTML = html;
+}
+
+// ---------- DETAIL ----------
+function openDetail(id){
+  state.selectedId = id;
+  const w = workers.find(x => x.id === id);
+  if(w && w.id !== state.myId){
+    w.views++;
+    state.recentlyViewed = state.recentlyViewed.filter(x => x !== id);
+    state.recentlyViewed.unshift(id);
+    if(state.recentlyViewed.length > 12) state.recentlyViewed.length = 12;
+  }
+  go('detail');
+  renderDetail();
+}
+
+let pendingStars = 5;
+
+function renderDetail(){
+  const w = workers.find(x => x.id === state.selectedId);
+  const card = document.getElementById('detail-card');
+  const d = distLabel(w);
+  const isSaved = state.savedIds.includes(w.id);
+  const skillLine = w.skills ? `<div class="skill-pills">${w.skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>` : '';
+  const fb = w.feedback || [];
+  const rating = avgRating(w);
+  const ratingLine = rating ? `<div class="rating-line">★ ${rating.toFixed(1)} average · ${fb.length} review${fb.length>1?'s':''}</div>` : '';
+  const fbList = fb.length
+    ? fb.map(f => `<div class="fb-item"><div class="fb-name">${f.name} <span class="stars">${'★'.repeat(f.stars)}${'☆'.repeat(5-f.stars)}</span></div><div class="fb-text">${f.text}</div></div>`).join('')
+    : `<p style="font-size:13.5px; color:var(--ink-soft);">No feedback yet — be the first to share how it went.</p>`;
+
+  const pausedNote = w.paused ? `<div class="safety-note" style="border-color:rgba(168,64,42,.3); background:rgba(168,64,42,.06); color:var(--rust);">This worker has put their profile on hold and may not be taking new requests right now.</div>` : '';
+
+  const contactButtons = w.allowCalls
+    ? `<button class="btn btn-green" onclick="requestCall(${w.id})">📞 Request masked call</button><button class="btn btn-primary" onclick="openChat(${w.id})">💬 Message</button>`
+    : `<button class="btn btn-primary" onclick="openChat(${w.id})">💬 Message securely</button>`;
+
+  const safetyNote = w.allowCalls
+    ? `<div class="safety-note">Calls go through Kaarigar's masked line and need ${w.name.split(' ')[0]}'s approval first. Neither side ever sees the other's real phone number.</div>`
+    : `<div class="safety-note female">For this worker's safety and comfort, direct or masked calling is switched off. Please use secure in-app chat — ${w.name.split(' ')[0]} can choose to enable calls later.</div>`;
+
+  card.innerHTML = `
+    <div class="detail-top">
+      <div class="avatar-circle avatar-lg" style="background:${w.avatarColor};" aria-hidden="true">${w.avatar}${w.verified ? '<span class="avatar-check">✓</span>' : ''}</div>
+      <div style="flex:1; min-width:0;">
+        <div class="dist-pill ${d.cls}">${d.text}</div>
+        <h2 style="margin:0 0 2px;">${w.category}<span class="gender-pill">${w.gender}</span></h2>
+        <div class="worker-subname">${w.name} · ${regTypeLabel(w.regType)}${w.verified ? '<span class="verified-chip">✓ Verified</span>' : ''}${w.paused ? '<span class="paused-chip">On hold</span>' : ''}</div>
+        <div class="worker-meta">${w.exp} ${w.regType==='business'?'people team':'yrs experience'} · ${w.city}<span class="avail-chip">${w.availability||'Flexible'}</span></div>
+        ${ratingLine}
+      </div>
+      <button class="fav-btn ${isSaved?'active':''}" aria-label="${isSaved?'Remove from favourites':'Save to favourites'}" onclick="toggleSave(${w.id}, event)">${isSaved?'♥':'♡'}</button>
+    </div>
+    ${skillLine}
+    <div class="rate-highlight">${w.rate}</div>
+    <p class="worker-bio" style="font-size:15px;">${w.bio}</p>
+    <p class="mono" style="font-size:13px; color:var(--ink-soft);">TCKT-${String(w.id).padStart(4,'0')}</p>
+
+    ${pausedNote}
+    <div class="contact-actions">${contactButtons}</div>
+    ${safetyNote}
+
+    <div class="feedback-section">
+      <h3 style="margin:0 0 12px; font-size:17px;">Feedback</h3>
+      ${fbList}
+      <div class="fb-form" style="margin-top:14px;">
+        <label>Rate your experience</label>
+        <div class="star-picker" id="star-picker">
+          ${[1,2,3,4,5].map(n => `<span data-n="${n}" class="${n<=pendingStars?'on':''}" onclick="setStars(${n})">★</span>`).join('')}
+        </div>
+        <textarea id="fb-text" rows="2" placeholder="How was your experience with ${w.name.split(' ')[0]}?"></textarea>
+        <button class="btn btn-amber btn-sm" onclick="submitFeedback(${w.id})">Submit feedback</button>
+      </div>
+    </div>
+  `;
+}
+
+function setStars(n){
+  pendingStars = n;
+  document.querySelectorAll('#star-picker span').forEach(s => {
+    s.classList.toggle('on', parseInt(s.dataset.n) <= n);
+  });
+}
+function submitFeedback(id){
+  const text = document.getElementById('fb-text').value.trim();
+  if(!text){ showToast('Write a short comment before submitting'); return; }
+  const w = workers.find(x => x.id === id);
+  w.feedback = w.feedback || [];
+  w.feedback.unshift({name:'You', stars: pendingStars, text});
+  pendingStars = 5;
+  renderDetail();
+  showToast('Thanks for the feedback!');
+}
+
+// ---------- MASKED CALL ----------
+function requestCall(id){
+  state.selectedId = id;
+  const w = workers.find(x => x.id === id);
+  const card = document.getElementById('call-card');
+  card.innerHTML = `
+    <div class="avatar-circle avatar-lg" style="background:${w.avatarColor}; margin:0 auto 16px;">${w.avatar}</div>
+    <h3 style="margin:0 0 4px;">${w.name}</h3>
+    <p style="color:var(--ink-soft); margin:0 0 18px;"><span class="call-pulse"></span>Waiting for ${w.name.split(' ')[0]} to approve your call request…</p>
+    <p class="mono" style="font-size:12.5px; color:var(--ink-soft);">Your number stays hidden even after they accept</p>
+    <div class="cta-row" style="justify-content:center; margin-top:22px;">
+      <button class="btn btn-primary" onclick="backFromCall()">Cancel request</button>
+    </div>
+  `;
+  go('call');
+  clearTimeout(window._callTimer);
+  window._callTimer = setTimeout(() => connectCall(id), 1600);
+}
+function connectCall(id){
+  if(state.selectedId !== id) return;
+  const w = workers.find(x => x.id === id);
+  w.calls++;
+  const card = document.getElementById('call-card');
+  card.innerHTML = `
+    <div class="avatar-circle avatar-lg" style="background:${w.avatarColor}; margin:0 auto 16px;">${w.avatar}</div>
+    <h3 style="margin:0 0 4px;">${w.name}</h3>
+    <p style="color:var(--ink-soft); margin:0 0 18px;"><span class="call-pulse"></span>Call approved — connecting securely…</p>
+    <p class="mono" style="font-size:12.5px; color:var(--ink-soft);">Masked line · your number and theirs both stay private</p>
+    <div class="cta-row" style="justify-content:center; margin-top:22px;">
+      <button class="btn btn-primary" onclick="backFromCall()">End call</button>
+    </div>
+  `;
+}
+function backFromCall(){ clearTimeout(window._callTimer); go('detail'); renderDetail(); }
+
+// ---------- CHAT ----------
+function openChat(id){
+  state.selectedId = id;
+  const w = workers.find(x => x.id === id);
+  if(!state.chatMessages[id]){
+    w.chats++;
+    state.chatMessages[id] = [
+      {from:'them', text:`Hi, thanks for reaching out! I'm ${w.name.split(' ')[0]}, available for ${w.category.toLowerCase()} work in ${w.city}. How can I help?`, time: nowTime(), status:'seen'}
+    ];
+  }
+  state.reportOpenFor = null;
+  go('chat');
+  renderChat();
+}
+function nowTime(){
+  const d = new Date();
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+function renderChat(){
+  const layout = document.getElementById('chat-layout');
+  const w = workers.find(x => x.id === state.selectedId);
+  const chatIds = Object.keys(state.chatMessages).map(id => parseInt(id, 10));
+
+  const listHtml = chatIds.length
+    ? chatIds.map(chatId => {
+        const convo = state.chatMessages[chatId];
+        const worker = workers.find(x => x.id === chatId);
+        const last = convo[convo.length - 1];
+        const snippet = last.text.length > 34 ? last.text.slice(0, 34) + '…' : last.text;
+        const active = state.selectedId === chatId;
+        const showNew = last.from === 'them' && !active;
+        return `
+          <button type="button" class="chat-list-item ${active?'active':''}" onclick="openChat(${chatId})">
+            <div class="avatar-circle avatar-sm" style="background:${worker.avatarColor};">${worker.avatar}</div>
+            <div style="flex:1; min-width:0;">
+              <div class="cli-name">${worker.name}</div>
+              <div class="cli-meta">${worker.category} · ${worker.city}</div>
+              <div class="cli-snippet">${snippet}</div>
+            </div>
+            ${showNew ? '<span class="new-badge">New</span>' : ''}
+          </button>
+        `;
+      }).join('')
+    : `<p style="font-size:13px; color:var(--ink-soft); padding:8px 6px;">No conversations yet. Message a worker from their profile.</p>`;
+
+  if(!w){
+    layout.innerHTML = `
+      <div class="chat-list-panel"><div class="chat-list-title">Conversations</div>${listHtml}</div>
+      <div class="empty-state"><div class="es-icon">💬</div>Pick a conversation on the left, or visit a profile and tap Message to start one.</div>
+    `;
+    return;
+  }
+
+  const msgs = state.chatMessages[w.id] || [];
+  const isBlocked = !!state.blockedChats[w.id];
+  const showReportPanel = state.reportOpenFor === w.id;
+
+  const bubblesHtml = msgs.map(m => `
+    <div class="bubble-row ${m.from}">
+      <div class="bubble ${m.from}">
+        ${m.text}
+        <div class="bubble-meta">${m.time}${m.from==='me' ? ' · ' + (m.status==='seen' ? 'Seen ✓✓' : 'Sent ✓') : ''}</div>
+      </div>
+    </div>
+  `).join('') + (state._typing ? `
+    <div class="bubble-row them">
+      <div class="typing-row"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+    </div>
+  ` : '');
+
+  layout.innerHTML = `
+    <div class="chat-list-panel">
+      <div class="chat-list-title">Conversations</div>
+      ${listHtml}
+    </div>
+    <div class="chat-main">
+      <div class="chat-head">
+        <div class="ch-title">
+          <div class="avatar-circle avatar-sm" style="background:${w.avatarColor};">${w.avatar}</div>
+          <div>
+            <div class="cn">${w.name}</div>
+            <div class="cs">${w.category} · ${w.city}</div>
+          </div>
+        </div>
+        <div class="chat-actions">
+          ${w.allowCalls ? `<button class="icon-btn" aria-label="Request call" onclick="requestCall(${w.id})">📞</button>` : ''}
+          <button class="icon-btn" aria-label="Report or block" onclick="toggleReportPanel(${w.id})">🚩</button>
+        </div>
+      </div>
+      ${showReportPanel ? `
+        <div class="report-panel">
+          <h4>Report or block this conversation</h4>
+          <div class="report-reasons">
+            <button onclick="submitReport(${w.id}, 'Spam')">Spam</button>
+            <button onclick="submitReport(${w.id}, 'Inappropriate behaviour')">Inappropriate behaviour</button>
+            <button onclick="submitReport(${w.id}, 'Other')">Other</button>
+          </div>
+          <button class="btn btn-rust btn-sm" onclick="blockChat(${w.id})">Block this contact</button>
+        </div>
+      ` : ''}
+      <div class="chat-body" id="chat-body">${bubblesHtml}</div>
+      ${isBlocked ? `
+        <div class="chat-blocked-note">You've blocked this contact. They can no longer message you.</div>
+      ` : `
+        <div class="quick-replies">
+          ${QUICK_REPLIES.map(q => `<button class="quick-reply-chip" onclick="sendQuickReply('${q.replace(/'/g, "\\'")}')">${q}</button>`).join('')}
+        </div>
+        <div class="privacy-strip">Numbers are never shared in chat — this conversation stays inside Kaarigar.</div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Type a message…" aria-label="Type a message" onkeydown="if(event.key==='Enter') sendChat()">
+          <button class="send-btn" aria-label="Send message" onclick="sendChat()">➤</button>
+        </div>
+      `}
+    </div>
+  `;
+  const body = document.getElementById('chat-body');
+  if(body) body.scrollTop = body.scrollHeight;
+}
+function toggleReportPanel(id){ state.reportOpenFor = state.reportOpenFor === id ? null : id; renderChat(); }
+function submitReport(id, reason){ state.reportOpenFor = null; renderChat(); showToast(`Reported (${reason}). Our team will review this conversation.`); }
+function blockChat(id){ state.blockedChats[id] = true; state.reportOpenFor = null; renderChat(); showToast('Contact blocked'); }
+function sendQuickReply(text){ const input = document.getElementById('chat-input'); if(input){ input.value = text; } sendChat(text); }
+function sendChat(overrideText){
+  const w = workers.find(x => x.id === state.selectedId);
+  if(!w || state.blockedChats[w.id]) return;
+  const input = document.getElementById('chat-input');
+  const text = overrideText || (input ? input.value.trim() : '');
+  if(!text) return;
+  state.chatMessages[w.id].push({from:'me', text, time: nowTime(), status:'sent'});
+  if(input) input.value = '';
+  renderChat();
+  state._typing = true;
+  renderChat();
+  setTimeout(() => {
+    state._typing = false;
+    state.chatMessages[w.id].forEach(m => { if(m.from==='me') m.status = 'seen'; });
+    state.chatMessages[w.id].push({from:'them', text:'Sure, I can help with that. When would you like me to come by?', time: nowTime()});
+    renderChat();
+  }, 1100);
+}
+
+// ---------- DASHBOARD ----------
+function profileCompleteness(w){
+  const checks = [
+    {label:'Profile photo style chosen', done: !!w.avatar},
+    {label:'Bio written', done: w.bio && w.bio.length > 15},
+    {label:'Rate added', done: w.rate && w.rate !== 'Ask for rate'},
+    {label:'Verified badge', done: !!w.verified},
+    {label:'At least 1 review', done: (w.feedback||[]).length > 0},
+  ];
+  const done = checks.filter(c=>c.done).length;
+  return {checks, pct: Math.round(done / checks.length * 100)};
+}
+
+function renderDashboard(){
+  const w = workers.find(x => x.id === state.myId);
+  if(!w){
+    document.getElementById('dash-loc').textContent = state.location;
+    document.getElementById('dashboard-ticket').innerHTML = `<div class="empty-state"><div class="es-icon">🪪</div>You don't have a ticket yet. <button class="btn btn-amber btn-sm" style="margin-top:12px;" onclick="openAuth('worker')">Register now</button></div>`;
+    document.getElementById('completeness-slot').innerHTML = '';
+    document.getElementById('dash-paused-banner').innerHTML = '';
+    document.getElementById('stat-views').textContent = '0';
+    document.getElementById('stat-chats').textContent = '0';
+    document.getElementById('stat-calls').textContent = '0';
+    return;
+  }
+  document.getElementById('dash-loc').textContent = w.city;
+  document.getElementById('stat-views').textContent = w.views;
+  document.getElementById('stat-chats').textContent = w.chats;
+  document.getElementById('stat-calls').textContent = w.calls;
+  document.getElementById('dashboard-ticket').innerHTML = ticketCardHtml(w, false);
+
+  document.getElementById('dash-paused-banner').innerHTML = w.paused ? `
+    <div class="paused-banner">
+      <div><strong>Your ticket is on hold.</strong><br><span style="font-size:13px; color:var(--ink-soft);">Hirers can't find or contact you while it's paused.</span></div>
+      <button class="btn btn-green btn-sm" onclick="resumeTicket()">▶ Resume ticket</button>
+    </div>
+  ` : '';
+
+  const c = profileCompleteness(w);
+  document.getElementById('completeness-slot').innerHTML = `
+    <div class="completeness-card">
+      <div class="sr-label">Profile strength — ${c.pct}%</div>
+      <div class="completeness-bar"><div class="completeness-fill" style="width:${c.pct}%;"></div></div>
+      <ul class="check-list">${c.checks.map(ch => `<li class="${ch.done?'done':''}">${ch.done?'✓':'○'} ${ch.label}</li>`).join('')}</ul>
+    </div>
+  `;
+}
+
+function shareMyTicket(){
+  const w = workers.find(x => x.id === state.myId);
+  if(!w) return;
+  showToast(`Link copied — kaarigar.app/t/TCKT-${String(w.id).padStart(4,'0')} (demo)`);
+}
+
+function pauseTicket(){
+  openModal(`
+    <h3>Pause your ticket?</h3>
+    <p>While paused, hirers won't be able to find your profile in Browse, message you, or call you. You can resume any time — nothing is deleted.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-rust btn-sm" onclick="confirmPause()">Pause my ticket</button>
+    </div>
+  `);
+}
+function confirmPause(){
+  const w = workers.find(x => x.id === state.myId);
+  if(w) w.paused = true;
+  closeModal();
+  renderDashboard();
+  renderSettings();
+  showToast('Your ticket is now on hold');
+}
+function resumeTicket(){
+  const w = workers.find(x => x.id === state.myId);
+  if(w) w.paused = false;
+  renderDashboard();
+  renderSettings();
+  showToast('Your ticket is live again');
+}
+
+function deleteTicket(){
+  openModal(`
+    <h3>Delete your ticket?</h3>
+    <p>This permanently removes your profile, stats and reviews from Kaarigar. This can't be undone. If you just need a break, pause your ticket instead.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-rust btn-sm" onclick="confirmDelete()">Delete permanently</button>
+    </div>
+  `);
+}
+function confirmDelete(){
+  workers = workers.filter(w => w.id !== state.myId);
+  state.myId = null;
+  closeModal();
+  showToast('Your ticket has been deleted');
+  go('home');
+}
+
+function toggleMyCallSetting(){
+  const w = workers.find(x => x.id === state.myId);
+  if(!w) return;
+  w.allowCalls = !w.allowCalls;
+  renderSettings();
+  showToast(w.allowCalls ? 'Masked call requests turned on' : 'Call requests turned off — chat only');
+}
+
+// ---------- SHORTLIST / RECENTLY VIEWED ----------
+function populateShortlistLocationSelect(){
+  const sel = document.getElementById('shortlist-loc-input');
+  if(!sel.dataset.filled){
+    sel.innerHTML = METRO_CITIES.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.dataset.filled = '1';
+  }
+  sel.value = state.location;
+}
+function onShortlistLocationChange(v){ state.location = v; renderShortlist(); }
+function setShortlistTab(tab){ state.shortlistTab = tab; renderShortlist(); }
+
+function renderShortlist(){
+  populateShortlistLocationSelect();
+  document.getElementById('shortlist-loc-label').textContent = state.location;
+  document.getElementById('tab-saved').classList.toggle('active', state.shortlistTab==='saved');
+  document.getElementById('tab-recent').classList.toggle('active', state.shortlistTab==='recent');
+  const groups = document.getElementById('shortlist-groups');
+
+  let list;
+  if(state.shortlistTab === 'saved'){
+    list = workers.filter(w => state.savedIds.includes(w.id));
+    if(list.length === 0){
+      groups.innerHTML = `<div class="empty-state"><div class="es-icon">⭐</div>You haven't shortlisted anyone yet. Tap the heart on any profile in Browse to add them here.</div>`;
+      return;
+    }
+  } else {
+    list = state.recentlyViewed.map(id => workers.find(w => w.id === id)).filter(Boolean);
+    if(list.length === 0){
+      groups.innerHTML = `<div class="empty-state"><div class="es-icon">🕘</div>No one viewed yet. Profiles you open in Browse will show up here so you can find them again.</div>`;
+      return;
+    }
+    groups.innerHTML = `<div class="grid-list">${list.map(w=>ticketCardHtml(w,true)).join('')}</div>`;
+    return;
+  }
+
+  list.sort((a,b) => effectiveDist(a) - effectiveDist(b));
+  const near = list.filter(w => effectiveDist(w) < 3);
+  const city = list.filter(w => effectiveDist(w) >= 3 && effectiveDist(w) < 15);
+  const far = list.filter(w => effectiveDist(w) >= 15);
+
+  let html = '';
+  if(near.length){ html += `<div class="group-label">Near you</div><div class="grid-list">${near.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  if(city.length){ html += `<div class="group-label">Same city</div><div class="grid-list">${city.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  if(far.length){ html += `<div class="group-label">Other metro cities</div><div class="grid-list">${far.map(w=>ticketCardHtml(w,true)).join('')}</div>`; }
+  groups.innerHTML = html;
+}
+
+// ---------- SETTINGS ----------
+const SETTINGS_TABS = [
+  {id:'profile', label:'Profile'},
+  {id:'privacy', label:'Privacy & Calling'},
+  {id:'availability', label:'Availability'},
+  {id:'notifications', label:'Notifications'},
+  {id:'account', label:'Account'},
+];
+function setSettingsTab(id){ state.settingsTab = id; renderSettings(); }
+
+function renderSettings(){
+  const w = workers.find(x => x.id === state.myId);
+  document.getElementById('settings-tabs').innerHTML = SETTINGS_TABS.map(t => `
+    <button class="settings-tab-btn ${state.settingsTab===t.id?'active':''}" onclick="setSettingsTab('${t.id}')">${t.label}</button>
+  `).join('');
+
+  const body = document.getElementById('settings-body');
+
+  if(state.settingsTab === 'profile'){
+    body.innerHTML = w ? `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">My profile</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 12px;">This is what hirers see when they open your ticket.</p>
+        ${ticketCardHtml(w, false)}
+        <div class="cta-row" style="margin-top:14px;">
+          <button class="btn btn-amber btn-sm" onclick="editMyProfile()">✎ Edit profile</button>
+          <button class="btn btn-primary btn-sm" onclick="shareMyTicket()">🔗 Share ticket</button>
+        </div>
+      </div>
+    ` : `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">My profile</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 12px;">You haven't listed yourself for work yet.</p>
+        <button class="btn btn-amber btn-sm" onclick="openAuth('worker')">Register as a worker</button>
+      </div>
+    `;
+    return;
+  }
+
+  if(state.settingsTab === 'privacy'){
+    if(!w){ body.innerHTML = noProfileCard('Privacy settings apply once you have a ticket.'); return; }
+    const callLabel = w.gender === 'Female' ? 'Ignore incoming call requests' : 'Accept masked call requests';
+    const callSub = w.gender === 'Female'
+      ? 'Recommended on for safety — hirers will only be able to message you, never call'
+      : 'Hirers can request a call, which you approve each time. Numbers stay hidden either way.';
+    const callToggleOn = w.gender === 'Female' ? !w.allowCalls : w.allowCalls;
+    body.innerHTML = `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">Privacy &amp; calling</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 6px;">Control how hirers can reach you.</p>
+        <div class="settings-row">
+          <div><div class="sr-label">${callLabel}</div><div class="sr-sub">${callSub}</div></div>
+          <button class="toggle ${callToggleOn?'on':''}" onclick="toggleMyCallSetting()"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">In-app chat</div><div class="sr-sub">Always on — your number is never shared in chat</div></div>
+          <button class="toggle on" disabled></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">Show verified badge</div><div class="sr-sub">${w.verified ? 'Your ticket already carries the verified mark' : 'Verification is granted by the Kaarigar team after a document check'}</div></div>
+          <span class="mono" style="font-size:12px; color:var(--ink-soft);">${w.verified ? '✓ Verified' : 'Not yet verified'}</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if(state.settingsTab === 'availability'){
+    if(!w){ body.innerHTML = noProfileCard('Availability controls apply once you have a ticket.'); return; }
+    body.innerHTML = `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">Availability</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 10px;">Not taking work right now? Put your ticket on hold instead of deleting it.</p>
+        <div class="settings-row">
+          <div><div class="sr-label">${w.paused ? 'Your ticket is on hold' : 'Your ticket is live'}</div><div class="sr-sub">${w.paused ? "Hidden from Browse until you resume it" : 'Visible to hirers browsing near you'}</div></div>
+          ${w.paused
+            ? `<button class="btn btn-green btn-sm" onclick="resumeTicket()">▶ Resume</button>`
+            : `<button class="btn btn-outline-rust btn-sm" onclick="pauseTicket()">⏸ Pause ticket</button>`}
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">Current schedule</div><div class="sr-sub">Shown on your ticket to hirers</div></div>
+          <span class="mono" style="font-size:12px; color:var(--ink-soft);">${w.availability}</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if(state.settingsTab === 'notifications'){
+    body.innerHTML = `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">Notifications</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 6px;">Choose what Kaarigar can notify you about. This is a prototype — no real push notifications are sent.</p>
+        <div class="settings-row">
+          <div><div class="sr-label">New messages</div><div class="sr-sub">When someone sends you a chat</div></div>
+          <button class="toggle ${state.notifChat?'on':''}" onclick="toggleNotif('notifChat')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">Call requests</div><div class="sr-sub">When someone requests a masked call</div></div>
+          <button class="toggle ${state.notifCalls?'on':''}" onclick="toggleNotif('notifCalls')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">Product updates</div><div class="sr-sub">New features and changes to Kaarigar</div></div>
+          <button class="toggle ${state.notifUpdates?'on':''}" onclick="toggleNotif('notifUpdates')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">Tips & suggestions</div><div class="sr-sub">Ways to get more views, like completing your ticket</div></div>
+          <button class="toggle ${state.notifTips?'on':''}" onclick="toggleNotif('notifTips')"></button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if(state.settingsTab === 'account'){
+    const maskedPhone = w ? `+91 ••••• ${w.phone.slice(-4)}` : 'Not signed in';
+    body.innerHTML = `
+      <div class="settings-card">
+        <h3 style="margin:0 0 4px; font-size:16px;">Account</h3>
+        <div class="account-row"><span>Mobile number</span><span class="av mono">${maskedPhone}</span></div>
+        <div class="account-row"><span>App language</span>
+          <select id="lang-select" onchange="onLangChange(this.value)" style="width:auto; padding:6px 10px; font-size:12.5px;">
+            <option value="English" ${state.language==='English'?'selected':''}>English</option>
+            <option value="Hindi" ${state.language==='Hindi'?'selected':''}>हिंदी</option>
+            <option value="Marathi" ${state.language==='Marathi'?'selected':''}>मराठी</option>
+            <option value="Telugu" ${state.language==='Telugu'?'selected':''}>Telugu</option>
+          </select>
+        </div>
+        <div class="account-row"><span>Preferred metro city</span>
+          <select id="settings-city-select" onchange="onSettingsCityChange(this.value)" style="width:auto; padding:6px 10px; font-size:12.5px;">
+            ${METRO_CITIES.map(c => `<option value="${c}" ${c===state.location?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3 style="margin:0 0 10px; font-size:16px;">Help &amp; support</h3>
+        <div class="account-row"><span>Support phone</span><a href="tel:+918919494848" class="av">+91 89194 94848</a></div>
+        <div class="account-row"><span>Support email</span><a href="mailto:pawangopallavudya@gmail.com" class="av">pawangopallavudya@gmail.com</a></div>
+        <div class="account-row"><span>Terms &amp; Privacy Policy</span><span class="av">View (coming soon)</span></div>
+      </div>
+      ${w ? `
+      <div class="settings-card danger-zone">
+        <h3 style="margin:0 0 4px; font-size:16px;">Danger zone</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin:0 0 10px;">Deleting removes your ticket, stats and reviews for good.</p>
+        <button class="btn btn-rust btn-sm" onclick="deleteTicket()">🗑 Delete my ticket</button>
+      </div>` : ''}
+    `;
+    return;
+  }
+}
+function noProfileCard(msg){
+  return `<div class="settings-card"><p style="font-size:13px; color:var(--ink-soft); margin:0 0 10px;">${msg}</p><button class="btn btn-amber btn-sm" onclick="openAuth('worker')">Register as a worker</button></div>`;
+}
+function onSettingsCityChange(v){ state.location = v; showToast(`Preferred city set to ${v}`); }
+function onLangChange(v){ state.language = v; showToast(`App language set to ${v} (demo)`); }
+function toggleNotif(key){ state[key] = !state[key]; renderSettings(); }
+
+// ---------- INIT ----------
+renderNav();
+renderHome();
+</script>
+</body>
+</html>
