@@ -1,6 +1,6 @@
-# Kaarigar
+# Woex
 
-Kaarigar is a responsive web prototype that helps people discover, contact, and hire nearby skilled workers without exposing phone numbers. Workers can create a service "ticket" while hirers can browse profiles by city, trade, distance, and verification status.
+Woex is a responsive web prototype that helps people discover, contact, and hire nearby skilled workers without exposing phone numbers. Workers can create a service "ticket" while hirers can browse profiles by city, trade, distance, and verification status.
 
 > **Project status:** The checked-in app is a front-end demo. OTP verification, masked calling, and location matching are simulated; no real phone numbers are sent by the demo.
 
