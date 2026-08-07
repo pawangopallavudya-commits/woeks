@@ -1,4 +1,4 @@
-# Woeks
+# Worx
 
 Woeks is a responsive web prototype that helps people discover, contact, and hire nearby skilled workers without exposing phone numbers. Workers can create a service "ticket" while hirers can browse profiles by city, trade, distance, and verification status.
 
